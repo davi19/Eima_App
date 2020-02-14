@@ -14,9 +14,32 @@ Future<Map<String, dynamic>> ponto(String usuario, String token) async {
         'Accept': 'application/json',
         'Authorization': '$token',
       });
+  if(resposta.statusCode==401){
+    return  json.decode('{"resultado":"erro"}');
+  }
+  if(resposta.statusCode==500){
+    return  json.decode('{"resultado":"OK","pontos":"0"}');
+  }
+  return json.decode(utf8.decode(resposta.bodyBytes));
+}
+
+
+Future<Map<String, dynamic>> extrato(String usuario, String token) async {
+
+  final http.Response resposta = await http.get(
+      urlBase+"RetornaExtrato/$usuario",
+      headers: {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': '$token',
+      });
   debugPrint(resposta.body.toString());
   if(resposta.statusCode==401){
     return  json.decode('{"resultado":"erro"}');
   }
+  if(resposta.statusCode==500){
+    return  json.decode('{"resultado":"OK","pontos":[]}');
+  }
+
   return json.decode(utf8.decode(resposta.bodyBytes));
 }

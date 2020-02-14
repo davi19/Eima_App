@@ -1,5 +1,3 @@
-import 'package:bloc_pattern/bloc_pattern.dart';
-import 'package:eima_app/Controllers/ControleTela.dart';
 import 'package:eima_app/View/ControleTela.dart';
 import 'package:eima_app/View/Login.dart';
 import 'package:flutter/material.dart';
@@ -30,11 +28,7 @@ Future main() async {
          '/login': (BuildContext context) => new Login(),
          '/Principal': (BuildContext context) => new Principal(),
        },
-       home:  BlocProvider(
-           child:home,
-           blocs: [
-             Bloc((i) => ControleTela()),
-           ]),
+       home:  home,
      ));
   });
 
