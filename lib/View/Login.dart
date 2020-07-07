@@ -35,8 +35,8 @@ class FormularioLogin extends State<Login> {
                     Padding(
                         padding: EdgeInsets.fromLTRB(20, 100, 20, 60),
                         child: Image.asset(
-                          'Imagens/EIMA_LOGO.png',
-
+                          'Imagens/EIMA.png',
+                          width: 200,
                         )),
                     Padding(
                         padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
