@@ -23,7 +23,7 @@ class TelaPrincipal extends State<Principal> {
       _token = prefs.getString("token");
     });
   }
-
+var _extrato;
   Widget build(BuildContext context) {
     if (_indice == 0) {
       viewTab = RetornaPontos();
@@ -40,18 +40,18 @@ class TelaPrincipal extends State<Principal> {
           child: viewTab,
         ),
         bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Color(0xFF006EB6),
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                   icon: Icon(Icons.account_balance_wallet,
                       size: 30, color: Colors.white),
-                  title: Text("Pontuação")),
+                  title: Text("Pontuação",style: TextStyle(color: Colors.white),)),
               BottomNavigationBarItem(
                   icon: Icon(Icons.insert_chart, size: 30, color: Colors.white),
-                  title: Text("Extrato")),
+                  title: Text("Extrato",style: TextStyle(color: Colors.white),)),
               BottomNavigationBarItem(
                   icon: Icon(Icons.exit_to_app, size: 30, color: Colors.white),
-                  title: Text("Sair"))
+                  title: Text("Sair",style: TextStyle(color: Colors.white),))
             ],
             onTap: (indice) async {
               switch (indice) {
@@ -80,6 +80,7 @@ class TelaPrincipal extends State<Principal> {
   }
 
   Widget RetornaPontos() {
+    try{
     return SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
           FutureBuilder<Map<String, dynamic>>(
@@ -91,7 +92,9 @@ class TelaPrincipal extends State<Principal> {
                       padding: EdgeInsets.fromLTRB(180, 50, 50, 0),
                       child: CircularProgressIndicator());
                 else {
-                  debugPrint(snapshot.data.toString());
+                  try{
+                  snapshot.data??RetornaPontos();
+                  snapshot.data["pontos"].toString()??RetornaPontos();
                   return Padding(
                       padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
                       child: Card(
@@ -127,15 +130,20 @@ class TelaPrincipal extends State<Principal> {
                                     )),
                               ])));
                 }
-                return null;
+                catch(e){
+                    return  RetornaPontos();
+                }}
               })
-        ]));
+        ]));}catch(e){
+      RetornaPontos();
+    }
   }
 
   Widget RetornaExtrato() {
+    try{
     return SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          FutureBuilder<Map<String, dynamic>>(
+       FutureBuilder<Map<String, dynamic>>(
               future: rest.extrato(_usuario, _token),
               builder: (BuildContext context,
                   AsyncSnapshot<Map<String, dynamic>> snapshot) {
@@ -144,7 +152,11 @@ class TelaPrincipal extends State<Principal> {
                       padding: EdgeInsets.fromLTRB(180, 50, 50, 0),
                       child: CircularProgressIndicator());
                 else {
-                  return Padding(
+                  if(snapshot.data==null){
+                    return RetornaExtrato();
+                  };
+                  _extrato = snapshot.data;
+                  return  Padding(
                       padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
                       child: Card(
                           elevation: 2,
@@ -164,24 +176,33 @@ class TelaPrincipal extends State<Principal> {
                                               fontSize: 16.0,
                                               color: Colors.white)),
                                     )),
-                                ListView.separated(
+                      RefreshIndicator(
+                          child:ListView.separated(
                                     separatorBuilder: (context, index) => Divider(
                                       color: Color(0xFF2CBBB5),
                                     ),
                                     scrollDirection: Axis.vertical,
                                     shrinkWrap: true,
-                                    itemCount: snapshot.data["pontos"].length,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: _extrato["pontos"].length,
                                     itemBuilder: (BuildContext ctxt, int index) {
                                       return InformacoesExtrato(
-                                          snapshot.data["pontos"][index]);
+                                          _extrato["pontos"][index]);
                                     })
-                              ])));
+                        ,onRefresh: () async {await  retornaDados();},)])));
                 }
-                return null;
               })
-        ]));
+        ]));}catch(e){
+     return RetornaExtrato();
+    }
   }
+  Future<Map<String, dynamic>> retornaDados() async {
+   var extrato = await  rest.extrato(_usuario, _token);
+   setState(() {
+     _extrato=extrato;
+   });
 
+  }
   Widget InformacoesExtrato(informacoes) {
     var corCancelado =
     informacoes["cancelado"].toString().contains("NÃO CANCELADO")

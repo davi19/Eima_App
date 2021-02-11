@@ -25,7 +25,6 @@ Future<Map<String, dynamic>> ponto(String usuario, String token) async {
 
 
 Future<Map<String, dynamic>> extrato(String usuario, String token) async {
-
   final http.Response resposta = await http.get(
       urlBase+"RetornaExtrato/$usuario",
       headers: {
